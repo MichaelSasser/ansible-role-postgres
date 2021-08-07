@@ -1,0 +1,23 @@
+---
+# tasks file for ansible-role-postgres
+
+- name: Ensure PostgreSQL user has been created
+  postgresql_user:
+    login_password: "{{ postgres_password}}"
+    name: "{{ outer_item.username }}"
+    password: "{{ outer_item.password }}"
+    role_attr_flags: "{{ outer_item.role_attr_flags | default('LOGIN')}}"
+    login_host: localhost
+    port: "{{ postgres_port }}"
+  when: outer_item.username is defined and outer_item.password is defined and if outer_item.role_attr_flags is defined
+
+- name: Ensure PostgreSQL database has been created
+  postgresql_db:
+    name: "{{ outer_item.database }}"
+    login_password: "{{ postgres_password}}"
+    owner: "{{ outer_item.username }}"
+    login_host: localhost
+    port: "{{ postgres_port }}"
+    target: "{{ postgres_schema | default(omit) }}"
+    state: "{{ (postgres_schema is defined) | ternary('restore', omit) }}"
+  when: outer_item.username is defined and outer_item.password is defined and if outer_item.role_attr_flags is defined

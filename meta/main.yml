@@ -1,0 +1,27 @@
+---
+
+dependencies: []
+
+galaxy_info:
+  author: Michael Sasser
+  description: Manage installation of postgres with podman
+  company: MichaelSasser.org
+  issue_tracker_url: https://github.com/MichaelSasser/ansible-role-postgres/issues
+  license: GPL-3.0-only
+  min_ansible_version: 2.9
+  # min_ansible_container_version:
+  github_branch: https://github.com/MichaelSasser/ansible-role-postgres
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  dependencies:
+    collections:
+      - name: containers.podman
+
+  galaxy_tags:
+    - postgres
+    - container

@@ -1,0 +1,31 @@
+---
+# defaults file for ansible-role-postgres
+
+postgres_docker_image: postgres
+postgres_docker_image_tag: "13-alpine"
+postgres_container_name: postgres
+postgres_port: 5432
+
+postgres_networks: null
+postgres_container_memory_limit: null
+postgres_upgrade: no
+
+postgres_system_postgres_disable: no
+# Mandatory
+# postgres_password: password of the postgres user
+
+# Optional (deprecated and removed)
+# postgres_user: db_user
+# postgres_user_password: db_password
+# postgres_database: my_db
+
+# Optional
+# postgres_databases:
+#   - database: mydb_1
+#     username: db_user
+#     password: db_password
+#     role_attr_flags: CREATEDB,SUPERUSER,LOGIN
+#   - database: mydb_1
+#     username: db_user
+#     password: db_password
+#     role_attr_flags: CREATEDB,SUPERUSER,LOGIN
