@@ -9,7 +9,7 @@
     role_attr_flags: "{{ outer_item.role_attr_flags | default('LOGIN')}}"
     login_host: localhost
     port: "{{ postgres_port }}"
-  when: outer_item.username is defined and outer_item.password is defined and if outer_item.role_attr_flags is defined
+  when: outer_item.username is defined and outer_item.password is defined and outer_item.role_attr_flags is defined
 
 - name: Ensure PostgreSQL database has been created
   postgresql_db:
@@ -20,4 +20,4 @@
     port: "{{ postgres_port }}"
     target: "{{ postgres_schema | default(omit) }}"
     state: "{{ (postgres_schema is defined) | ternary('restore', omit) }}"
-  when: outer_item.username is defined and outer_item.password is defined and if outer_item.role_attr_flags is defined
+  when: outer_item.username is defined and outer_item.password is defined and outer_item.role_attr_flags is defined

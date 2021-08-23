@@ -6,7 +6,8 @@ postgres_docker_image_tag: "13-alpine"
 postgres_container_name: postgres
 postgres_port: 5432
 
-postgres_networks: null
+postgres_networks: 
+  - name: "{{ docker_network_name }}"
 postgres_container_memory_limit: null
 postgres_upgrade: no
 

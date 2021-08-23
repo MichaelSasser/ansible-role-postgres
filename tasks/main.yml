@@ -43,6 +43,7 @@
     container_default_behavior: no_defaults
     networks: "{{ postgres_networks }}"
     networks_cli_compatible: yes
+    network_mode: default
   when: postgres_password is defined
   register: postgres_container
 
