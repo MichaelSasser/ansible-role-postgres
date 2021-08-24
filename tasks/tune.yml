@@ -1,0 +1,15 @@
+---
+# tasks file for ansible-role-postgres
+
+# https://pgtune.leopard.in.ua/#/
+
+- name: Tune PostgreSQL
+  community.postgresql.postgresql_set:
+    login_password: "{{ postgres_password}}"
+    login_host: localhost
+    port: "{{ postgres_port }}" # login_port
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ postgres_tune | dict2items }}"
+  notify:
+    - restart postgres

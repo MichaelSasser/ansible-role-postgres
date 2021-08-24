@@ -6,7 +6,7 @@ postgres_docker_image_tag: "13-alpine"
 postgres_container_name: postgres
 postgres_port: 5432
 
-postgres_networks: 
+postgres_networks:
   - name: "{{ docker_network_name }}"
 postgres_container_memory_limit: null
 postgres_upgrade: no
@@ -21,12 +21,23 @@ postgres_system_postgres_disable: no
 # postgres_database: my_db
 
 # Optional
+# postgres_roles:
+#   - role: userfoo
+#     password: "secret_foo"
+#     comment: Just a foo user
+#     role_attr_flags: CREATEDB,NOSUPERUSER,LOGIN
+#     priv:
+#     expires:
+#     state: present
+#   - role: userbar
+#     password: "secret_bar"
+#     comment: Just a bar user
+#     role_attr_flags: NOSUPERUSER,LOGIN
+#
 # postgres_databases:
-#   - database: mydb_1
-#     username: db_user
-#     password: db_password
-#     role_attr_flags: CREATEDB,SUPERUSER,LOGIN
-#   - database: mydb_1
-#     username: db_user
-#     password: db_password
-#     role_attr_flags: CREATEDB,SUPERUSER,LOGIN
+#   - database: foo
+#     owner: userfoo
+#     conn_limit: 100
+#     state: present
+#   - database: bar
+#     owner: userbar

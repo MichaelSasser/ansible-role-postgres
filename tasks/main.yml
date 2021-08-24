@@ -1,12 +1,23 @@
 ---
 # tasks file for ansible-role-postgres
 
+- name: Ensure db client packages are installed (Debian/Ubuntu)
+  apt:
+    name:
+      - postgresql
+      - libpq-dev
+      - python3-psycopg2
+    state: present
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
 - name: Ensure hosts system-postgres is stopped and disabled
   systemd:
     name: system-postgresql.slice
     state: stopped
     enabled: no
   when: postgres_system_postgres_disable
+  notify:
+    - restart postgres
 
 - name: Ensure PostgreSQL image is pulled
   docker_image:
@@ -18,9 +29,11 @@
   docker_container:
     name: "{{ postgres_container_name }}-data"
     image: "{{ postgres_docker_image }}:{{ postgres_docker_image_tag }}"
-    container_default_behavior: no_defaults
     pull: "{{ postgres_upgrade | default(false) | bool }}"
+    container_default_behavior: no_defaults
     state: present
+  notify:
+    - restart postgres
 
 - name: Ensure PostgreSQL container runs
   docker_container:
@@ -28,7 +41,7 @@
     image: "{{ postgres_docker_image }}:{{ postgres_docker_image_tag }}"
     restart_policy: always
     state: started
-    restart: yes
+    # restart: yes
     memory: "{{ opstgres_container_memory_limit | default(omit) }}"
     volumes:
       - "{{ postgres_container_name }}-data:/var/lib/postgresql/data"
@@ -45,30 +58,26 @@
     networks_cli_compatible: yes
     network_mode: default
   when: postgres_password is defined
-  register: postgres_container
+  notify:
+    - restart postgres
 
-- name: Wait until PostgreSQL starts up
-  wait_for:
-    port: "{{ postgres_port }}"
-    delay: 5
-  when: postgres_container.changed
+- name: Ensure PostgreSQL is restarted (if required)
+  meta: flush_handlers
 
-- name: Ensure db client packages are installed (Debian/Ubuntu)
-  apt:
-    name:
-      - postgresql
-      - libpq-dev
-      - python3-psycopg2
-    state: present
-  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+- name: Ensure roles are created.
+  include_tasks: create_roles.yml
+  with_items: "{{ postgres_roles }}"
+  loop_control:
+    loop_var: outer_item
+  when: postgres_roles is defined
 
-# stop and disable postgresql@11-main.service
-#
-#
-
-- name: Ensure Server is created and ready to use
+- name: Ensure databases are created.
   include_tasks: create_databases.yml
   with_items: "{{ postgres_databases }}"
   loop_control:
     loop_var: outer_item
   when: postgres_databases is defined
+
+- name: Ensure postgres is tuned
+  include_tasks: tune.yml
+  when: postgres_tune is defined
