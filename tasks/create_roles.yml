@@ -1,8 +1,8 @@
 ---
 # tasks file for ansible-role-postgres
 
-- name: "Ensure PostgreSQL user {{ outer_item.role }} has been created"
-  postgresql_user:
+- name: "Ensure PostgreSQL role has been created"
+  community.postgresql.postgresql_user:
     login_password: "{{ postgres_password}}"
     login_host: localhost
     port: "{{ postgres_port }}" # login_port

@@ -2,11 +2,11 @@
 # handlers file for ansible-role-postgres
 
 - name: Restart PostgreSQL
-  command: "docker restart {{ postgres_container_name }}"
+  ansible.builtin.command: "docker restart {{ postgres_container_name }}"
   listen: restart postgres
 
 - name: Wait until PostgreSQL starts up
-  wait_for:
+  ansible.builtin.wait_for:
     port: "{{ postgres_port }}"
     delay: 5
   listen: restart postgres

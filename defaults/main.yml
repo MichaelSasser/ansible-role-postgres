@@ -1,8 +1,10 @@
 ---
 # defaults file for ansible-role-postgres
 
+postgres_major_version: 14
+
 postgres_docker_image: postgres
-postgres_docker_image_tag: "13-alpine"
+postgres_docker_image_tag: "{{ postgres_major_version }}-alpine"
 postgres_container_name: postgres
 postgres_port: 5432
 

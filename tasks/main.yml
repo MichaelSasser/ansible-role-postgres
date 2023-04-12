@@ -2,7 +2,7 @@
 # tasks file for ansible-role-postgres
 
 - name: Ensure db client packages are installed (Debian/Ubuntu)
-  apt:
+  ansible.builtin.apt:
     name:
       - postgresql
       - libpq-dev
@@ -11,7 +11,7 @@
   when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
 - name: Ensure hosts system-postgres is stopped and disabled
-  systemd:
+  ansible.builtin.systemd:
     name: system-postgresql.slice
     state: stopped
     enabled: no
@@ -20,14 +20,14 @@
     - restart postgres
 
 - name: Ensure PostgreSQL image is pulled
-  docker_image:
+  community.docker.docker_image:
     name: "{{ postgres_docker_image }}"
     tag: "{{ postgres_docker_image_tag }}"
     source: pull
 
 - name: Ensure data container is created
-  docker_container:
-    name: "{{ postgres_container_name }}-data"
+  community.docker.docker_container:
+    name: "{{ postgres_container_name }}-{{ postgres_major_version }}-data"
     image: "{{ postgres_docker_image }}:{{ postgres_docker_image_tag }}"
     pull: "{{ postgres_upgrade | default(false) | bool }}"
     container_default_behavior: no_defaults
@@ -36,17 +36,17 @@
     - restart postgres
 
 - name: Ensure PostgreSQL container runs
-  docker_container:
+  community.docker.docker_container:
     name: "{{ postgres_container_name }}"
     image: "{{ postgres_docker_image }}:{{ postgres_docker_image_tag }}"
     restart_policy: always
     state: started
     # restart: yes
-    memory: "{{ opstgres_container_memory_limit | default(omit) }}"
+    # memory: "{{ opstgres_container_memory_limit | default(omit) }}"
     volumes:
-      - "{{ postgres_container_name }}-data:/var/lib/postgresql/data"
+      - "{{ postgres_container_name }}-{{ postgres_major_version }}-data:/var/lib/postgresql/data"
     volumes_from:
-      - "{{ postgres_container_name }}-data"
+      - "{{ postgres_container_name }}-{{ postgres_major_version }}-data"
     ports:
       - "{{ postgres_port }}:5432"
     env:
@@ -62,22 +62,22 @@
     - restart postgres
 
 - name: Ensure PostgreSQL is restarted (if required)
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Ensure roles are created.
-  include_tasks: create_roles.yml
+  ansible.builtin.include_tasks: create_roles.yml
   with_items: "{{ postgres_roles }}"
   loop_control:
     loop_var: outer_item
   when: postgres_roles is defined
 
 - name: Ensure databases are created.
-  include_tasks: create_databases.yml
+  ansible.builtin.include_tasks: create_databases.yml
   with_items: "{{ postgres_databases }}"
   loop_control:
     loop_var: outer_item
   when: postgres_databases is defined
 
 - name: Ensure postgres is tuned
-  include_tasks: tune.yml
+  ansible.builtin.include_tasks: tune.yml
   when: postgres_tune is defined
